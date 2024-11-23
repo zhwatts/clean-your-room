@@ -5,10 +5,19 @@ import "./GameInstructionsModal.css";
 
 interface GameInstructionsModalProps {
   onStart: () => void;
+  onClose: () => void;
 }
 
-function GameInstructionsModal({ onStart }: GameInstructionsModalProps) {
+function GameInstructionsModal({
+  onStart,
+  onClose,
+}: GameInstructionsModalProps) {
   const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    onClose();
+  };
 
   // Add keyboard event handler
   useEffect(() => {
@@ -35,6 +44,9 @@ function GameInstructionsModal({ onStart }: GameInstructionsModalProps) {
   return (
     <div className="instructions-modal-overlay">
       <div className="instructions-modal">
+        <button className="instructions-close" onClick={handleClose}>
+          ×
+        </button>
         <h2>How to Play</h2>
 
         <div className="story-section">

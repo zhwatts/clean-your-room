@@ -29,6 +29,11 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
     if (selectedPlayer) {
       onPlayerSelect(selectedPlayer);
     }
+    setShowInstructions(false);
+  };
+
+  const handleCloseInstructions = () => {
+    setShowInstructions(false);
   };
 
   const sortedPlayers = [...existingPlayers].sort((a, b) => {
@@ -130,7 +135,10 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
       )}
 
       {showInstructions && (
-        <GameInstructionsModal onStart={handleInstructionsComplete} />
+        <GameInstructionsModal
+          onStart={handleInstructionsComplete}
+          onClose={handleCloseInstructions}
+        />
       )}
     </div>
   );
