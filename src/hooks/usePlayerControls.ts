@@ -130,32 +130,8 @@ export default function usePlayerControls(
     }
   }, []);
 
-  useEffect(() => {
-    const handleWindowBlur = () => {
-      setIsLocked(false);
-      resetControls();
-    };
-
-    window.addEventListener("blur", handleWindowBlur);
-    return () => window.removeEventListener("blur", handleWindowBlur);
-  }, [resetControls]);
-
-  useEffect(() => {
-    const handleBlur = () => resetControls();
-    const handleVisibilityChange = () => {
-      if (document.hidden) resetControls();
-    };
-    const handleFocusOut = () => resetControls();
-
-    window.addEventListener("blur", handleBlur);
-    window.addEventListener("keydown", handleKeyDown, { capture: true });
-    window.addEventListener("keyup", handleKeyUp, { capture: true });
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focusout", handleFocusOut);
-
-    lastUpdate.current = performance.now();
-
-    const updatePosition = (timestamp: number) => {
+  const updatePosition = useCallback(
+    (timestamp: number) => {
       const deltaTime = (timestamp - lastUpdate.current) / 1000;
       lastUpdate.current = timestamp;
 
@@ -200,7 +176,52 @@ export default function usePlayerControls(
       });
 
       animationFrameId.current = requestAnimationFrame(updatePosition);
+    },
+    [checkCollision]
+  );
+
+  useEffect(() => {
+    const handleWindowBlur = () => {
+      setIsLocked(true);
+      resetControls();
     };
+
+    const handleWindowFocus = () => {
+      setIsLocked(false);
+      if (!animationFrameId.current) {
+        animationFrameId.current = requestAnimationFrame(updatePosition);
+      }
+    };
+
+    window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [resetControls, updatePosition]);
+
+  useEffect(() => {
+    const handleBlur = () => {
+      resetControls();
+    };
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        resetControls();
+      }
+    };
+    const handleFocusOut = () => {
+      resetControls();
+    };
+
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("keydown", handleKeyDown, { capture: true });
+    window.addEventListener("keyup", handleKeyUp, { capture: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focusout", handleFocusOut);
+
+    lastUpdate.current = performance.now();
 
     animationFrameId.current = requestAnimationFrame(updatePosition);
 
@@ -212,7 +233,13 @@ export default function usePlayerControls(
       window.removeEventListener("focusout", handleFocusOut);
       resetControls();
     };
-  }, [handleKeyDown, handleKeyUp, checkCollision, resetControls]);
+  }, [
+    handleKeyDown,
+    handleKeyUp,
+    checkCollision,
+    resetControls,
+    updatePosition,
+  ]);
 
   return {
     position,
