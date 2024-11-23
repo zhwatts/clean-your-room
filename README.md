@@ -24,4 +24,7 @@ Using you keyboard, wander around the room, pickup clutter, and put it back in y
 - Timer: The amount of time it took us to get the room cleaned up.
 
 **_How To Deploy:_**
-TBD
+Deployments are automatically managed via Vercel pipeline. When you push to the master branch, it will automatically deploy to vercel.
+
+**_Deployed URL:_**
+https://clean-your-room-master.vercel.app/
