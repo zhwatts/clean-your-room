@@ -1,0 +1,130 @@
+.instructions-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.instructions-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.instructions-modal h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 2rem;
+  color: #2d3436;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.story-section {
+  font-size: 1.2rem;
+  color: #e17055;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.instructions-section {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #2d3436;
+  margin-bottom: 2rem;
+}
+
+.controls-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.controls-section h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.keyboard-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.arrow-keys {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.key-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.key {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: 2px solid #2d3436;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 2px 0 #2d3436;
+}
+
+.space-key {
+  width: 200px;
+  height: 40px;
+}
+
+.key-label {
+  font-size: 0.9rem;
+  color: #636e72;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.start-button {
+  background-color: #00b894;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.start-button:hover {
+  background-color: #00a187;
+}
+
+.spacebar-hint {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-weight: normal;
+  margin-left: 0.5rem;
+} 

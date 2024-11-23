@@ -1,0 +1,66 @@
+.mobile-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  padding: 1rem;
+}
+
+.mobile-warning-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e9ecef;
+}
+
+.mobile-warning-content h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #2d3436;
+  margin-bottom: 1.5rem;
+}
+
+.warning-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.primary-message {
+  font-size: 1.2rem;
+  color: #e17055;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.secondary-message {
+  color: #2d3436;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.action-message {
+  color: #00b894;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.device-suggestion {
+  color: #636e72;
+  font-size: 0.9rem;
+}
+
+.device-icons {
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+} 
