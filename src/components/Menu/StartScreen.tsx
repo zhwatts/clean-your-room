@@ -95,6 +95,10 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
             ))}
           </div>
         )}
+
+        <div className="tag-line">
+          <p>Fun as designed by ZachWatts.Online 🤖</p>
+        </div>
       </div>
 
       <div className="main-content">

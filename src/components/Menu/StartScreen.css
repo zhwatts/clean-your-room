@@ -8,6 +8,8 @@
 }
 
 .players-sidebar {
+  display:flex;
+  flex-direction: column;
   width: 450px;
   height: 100%;
   border-right: none;
@@ -50,19 +52,19 @@
 
 .player-card:nth-child(1) {
   background-color: rgba(255, 215, 0, 0.5);
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 15px 15px 0;
   border-bottom: none;
 }
 
 .player-card:nth-child(2) {
   background-color: rgba(192, 192, 192, 0.5);
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 15px 15px 0;
   border-bottom: none;
 }
 
 .player-card:nth-child(3) {
   background-color: rgba(205, 127, 50, 0.5);
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 15px 15px 0;
   border-bottom: none;
 }
 
@@ -286,3 +288,14 @@
   justify-content: center;
   align-items: center;
 } 
+
+.tag-line {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  color: #00b894;
+  text-align: center;
+  margin-top: auto;
+  padding: 1rem 0;
+  width: 100%;
+}
