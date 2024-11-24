@@ -16,11 +16,8 @@ app.use(morgan("dev"));
 
 // MongoDB connection
 const MONGODB_URI =
-  "mongodb+srv://zhwatts:jxBFFW6mU23ZXFwO@clean-your-room.tf28x.mongodb.net/?retryWrites=true&w=majority&appName=clean-your-room"; // Update with your MongoDB URI
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+  "mongodb+srv://zhwatts:jxBFFW6mU23ZXFwO@clean-your-room.tf28x.mongodb.net/?retryWrites=true&w=majority&appName=clean-your-room";
+mongoose.connect(MONGODB_URI);
 
 // Define a Player model
 const playerSchema = new mongoose.Schema({
@@ -56,31 +53,32 @@ app.post("/players", async (req, res) => {
 });
 
 app.put("/players/:id", async (req, res) => {
-  const { name, avatarId, isLocalAvatar, bestTime, lastTime } = req.body;
+  const { bestTime, lastTime, avatarId, name, isLocalAvatar } = req.body;
 
   try {
     const player = await Player.findOne({ id: req.params.id });
 
     if (player) {
-      console.log(
-        `Updating player: ${player.name}, Avatar ID: ${avatarId}, Name: ${name}`
-      );
-
-      player.name = name !== undefined ? name : player.name;
-      player.avatarId = avatarId !== undefined ? avatarId : player.avatarId;
-      player.isLocalAvatar =
-        isLocalAvatar !== undefined ? isLocalAvatar : player.isLocalAvatar;
-      player.lastTime = lastTime !== undefined ? lastTime : player.lastTime;
-
-      // Update bestTime only if the new bestTime is better
-      if (
-        bestTime !== undefined &&
-        (player.bestTime === null || bestTime < player.bestTime)
-      ) {
-        console.log(
-          `Updating best time for player: ${player.name}, New Best Time: ${bestTime}`
-        );
+      if (bestTime && player.bestTime > bestTime) {
         player.bestTime = bestTime;
+      }
+
+      if (lastTime) {
+        player.lastTime = lastTime;
+      }
+
+      if (name) {
+        player.name = name;
+      }
+
+      if (avatarId) {
+        player.avatarId = avatarId;
+      }
+
+      if (isLocalAvatar !== undefined) {
+        isLocalAvatar === false
+          ? (player.isLocalAvatar = false)
+          : (player.isLocalAvatar = true);
       }
 
       await player.save();

@@ -8,10 +8,8 @@ const API_URL = "http://localhost:5001";
 export const createPlayer = async (
   player: Player
 ): Promise<Player | undefined> => {
-  console.log("Creating player:", player);
   try {
     const response = await axios.post(`${API_URL}/players`, player);
-    console.log("Player created:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error creating player:", error);

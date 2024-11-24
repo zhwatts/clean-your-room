@@ -51,12 +51,13 @@ const NewPlayerForm: React.FC<NewPlayerFormProps> = ({
       name: name.trim(),
       avatarId: avatarId || "",
       isLocalAvatar: isLocal,
-      bestTime: playerToEdit?.bestTime || null,
-      lastTime: playerToEdit?.lastTime || null,
+      bestTime: playerToEdit?.bestTime || undefined,
+      lastTime: playerToEdit?.lastTime || undefined,
     };
 
     if (playerToEdit) {
       const updatedPlayer = await updatePlayer(playerData.id, playerData);
+
       if (updatedPlayer && onPlayerUpdated) {
         onPlayerUpdated(updatedPlayer);
       }
@@ -107,14 +108,14 @@ const NewPlayerForm: React.FC<NewPlayerFormProps> = ({
             ))}
           </div>
 
-          <div className="avatar-section-title">
+          {/* <div className="avatar-section-title">
             <button
               className="use-existing-button"
               onClick={() => setShowExistingAvatars(!showExistingAvatars)}
             >
               {showExistingAvatars ? "Hide User Avatars" : "Show User Avatars"}
             </button>
-          </div>
+          </div> */}
 
           {showExistingAvatars && (
             <div className="existing-avatars">

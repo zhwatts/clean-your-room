@@ -189,13 +189,15 @@ function Game({ player, onGameEnd }: GameProps) {
           );
 
           // Update player scores in the backend
+          console.log("PLAYER TO UPDATE", player);
+
           updatePlayer(player.id, {
             lastTime: prev.currentTime,
-            bestTime:
-              player.bestTime === null ||
-              prev.currentTime < (player.bestTime ?? Infinity)
-                ? prev.currentTime
-                : player.bestTime,
+            bestTime: prev.currentTime,
+            // player.bestTime === null ||
+            // prev.currentTime < (player.bestTime ?? Infinity)
+            //   ? prev.currentTime
+            //   : player.bestTime,
           });
 
           setTimeout(onGameEnd, 1000);
