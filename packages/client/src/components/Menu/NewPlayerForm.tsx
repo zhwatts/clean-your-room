@@ -108,14 +108,14 @@ const NewPlayerForm: React.FC<NewPlayerFormProps> = ({
             ))}
           </div>
 
-          {/* <div className="avatar-section-title">
+          <div className="avatar-section-title">
             <button
               className="use-existing-button"
               onClick={() => setShowExistingAvatars(!showExistingAvatars)}
             >
               {showExistingAvatars ? "Hide User Avatars" : "Show User Avatars"}
             </button>
-          </div> */}
+          </div>
 
           {showExistingAvatars && (
             <div className="existing-avatars">

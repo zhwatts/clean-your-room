@@ -55,7 +55,7 @@ const PlayerConfigModal: React.FC<PlayerConfigModalProps> = ({
       <AvatarUpload
         currentAvatar={avatarId}
         onAvatarChange={handleAvatarChange}
-        onAvatarDelete={() => setAvatarId(undefined)}
+        onAvatarDelete={() => setAvatarId("")}
         onTakePhoto={() => {}}
       />
       <button onClick={handleClearScores}>Clear Scores</button>

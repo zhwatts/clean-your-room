@@ -8,7 +8,7 @@
     "client": "npm run dev --workspace=packages/client",
     "server": "npm run server:dev --workspace=packages/server",
     "dev": "concurrently \"npm run client\" \"npm run server\"",
-    "build": "npm run build --workspace=packages/client && npm run build --workspace=packages/server"
+    "build": "npm run build --workspace=packages/client"
   },
   "devDependencies": {
     "concurrently": "^8.0.0"
