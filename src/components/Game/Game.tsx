@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect, useState, useCallback } from "react";
-import { Player } from "../../types";
+import { Player } from "../../models/Player";
 import Room from "./Room";
 import usePlayerControls from "../../hooks/usePlayerControls";
 import { storage } from "../../utils/storage";
@@ -10,6 +10,7 @@ import { generateGameState } from "../../utils/gameSetup";
 import { soundManager } from "../../utils/sounds";
 import { musicManager } from "../../utils/music";
 import CountdownModal from "../UI/CountdownModal";
+import { updatePlayer } from "../../services/PlayerService"; // Import updatePlayer
 
 interface GameProps {
   player: Player;
@@ -181,6 +182,22 @@ function Game({ player, onGameEnd }: GameProps) {
           storage.saveScore(player.id, prev.currentTime);
           musicManager.stopAll();
           soundManager.play("complete");
+
+          // Debugging: Log the current and best times
+          console.log(
+            `Player: ${player.name}, Last Time: ${prev.currentTime}, Best Time: ${player.bestTime}`
+          );
+
+          // Update player scores in the backend
+          updatePlayer(player.id, {
+            lastTime: prev.currentTime,
+            bestTime:
+              player.bestTime === null ||
+              prev.currentTime < (player.bestTime ?? Infinity)
+                ? prev.currentTime
+                : player.bestTime,
+          });
+
           setTimeout(onGameEnd, 1000);
         } else {
           soundManager.play("deposit");
@@ -231,6 +248,11 @@ function Game({ player, onGameEnd }: GameProps) {
 
     return () => clearInterval(cooldownTimer);
   }, []);
+
+  // Determine the avatar source
+  const avatarSrc = player.isLocalAvatar
+    ? localStorage.getItem(player.avatarId) || ""
+    : player.avatarId;
 
   return (
     <div className="game">
@@ -287,7 +309,7 @@ function Game({ player, onGameEnd }: GameProps) {
           </div>
           <Room
             gameState={gameState}
-            player={player}
+            avatarSrc={avatarSrc}
             onCollision={handleClutterCollision}
             onDepositClutter={handleDepositClutter}
           />

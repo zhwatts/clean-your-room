@@ -1,13 +1,12 @@
 /** @format */
 
-import { useState } from "react";
-import { Player } from "../../types";
-import { storage } from "../../utils/storage";
+import { useState, useEffect } from "react";
+import { Player } from "../../models/Player";
 import Modal from "../UI/Modal";
 import NewPlayerForm from "./NewPlayerForm";
-import PlayerConfig from "./PlayerConfig";
 import "./StartScreen.css";
 import GameInstructionsModal from "../UI/GameInstructionsModal";
+import { fetchPlayers } from "../../services/PlayerService";
 
 interface StartScreenProps {
   onPlayerSelect: (player: Player) => void;
@@ -15,10 +14,21 @@ interface StartScreenProps {
 
 function StartScreen({ onPlayerSelect }: StartScreenProps) {
   const [showNewPlayerModal, setShowNewPlayerModal] = useState(false);
-  const [showConfigModal, setShowConfigModal] = useState<string | null>(null);
+  const [playerToEdit, setPlayerToEdit] = useState<Player | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
-  const existingPlayers = storage.getPlayers();
+  const [existingPlayers, setExistingPlayers] = useState<Player[]>([]);
+
+  useEffect(() => {
+    const loadPlayers = async () => {
+      const players = await fetchPlayers();
+      if (players) {
+        setExistingPlayers(players);
+      }
+    };
+
+    loadPlayers();
+  }, []);
 
   const handleStartGame = (player: Player) => {
     setSelectedPlayer(player);
@@ -51,54 +61,54 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
           <div className="no-players">No existing players</div>
         ) : (
           <div className="players-list">
-            {sortedPlayers.map((player) => (
-              <div key={player.id} className="player-card">
-                <div className="player-avatar">
-                  {player.avatar ? (
-                    <img src={player.avatar} alt={player.name} />
-                  ) : (
-                    <div className="avatar-placeholder" />
-                  )}
-                </div>
-                <div className="player-info">
-                  <h3>{player.name}</h3>
+            {sortedPlayers.map((player) => {
+              const avatarSrc = player.isLocalAvatar
+                ? localStorage.getItem(player.avatarId) || ""
+                : player.avatarId;
 
-                  <div className="player-scores">
-                    {player.bestTime && (
-                      <span className="best-time">
-                        <>Best: {Math.round(player.bestTime)}s</>
-                      </span>
-                    )}
-
-                    {player.lastTime && (
-                      <span className="last-time">
-                        Last: {Math.round(player.lastTime)}s
-                      </span>
+              return (
+                <div key={player.id} className="player-card">
+                  <div className="player-avatar">
+                    {avatarSrc ? (
+                      <img src={avatarSrc} alt={player.name} />
+                    ) : (
+                      <div className="avatar-placeholder">No Avatar</div>
                     )}
                   </div>
+                  <div className="player-info">
+                    <h3>{player.name}</h3>
+                    <div className="player-scores">
+                      {player.bestTime !== undefined && (
+                        <span className="best-time">
+                          Best: {Math.round(player.bestTime)}s
+                        </span>
+                      )}
+                      {player.lastTime !== undefined && (
+                        <span className="last-time">
+                          Last: {Math.round(player.lastTime)}s
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="player-actions">
+                    <button
+                      className="config-button"
+                      onClick={() => setPlayerToEdit(player)}
+                    >
+                      Config
+                    </button>
+                    <button
+                      className="play-button"
+                      onClick={() => handleStartGame(player)}
+                    >
+                      Play
+                    </button>
+                  </div>
                 </div>
-                <div className="player-actions">
-                  <button
-                    className="config-button"
-                    onClick={() => setShowConfigModal(player.id)}
-                  >
-                    Config
-                  </button>
-                  <button
-                    className="play-button"
-                    onClick={() => handleStartGame(player)}
-                  >
-                    Play
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
-
-        <div className="tag-line">
-          <p>Fun as designed by ZachWatts.Online 🤖</p>
-        </div>
       </div>
 
       <div className="main-content">
@@ -116,24 +126,29 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
         </div>
       </div>
 
-      {showNewPlayerModal && (
-        <Modal onClose={() => setShowNewPlayerModal(false)}>
+      {(showNewPlayerModal || playerToEdit) && (
+        <Modal
+          onClose={() => {
+            setShowNewPlayerModal(false);
+            setPlayerToEdit(null);
+          }}
+        >
           <NewPlayerForm
             existingPlayers={existingPlayers}
             onPlayerCreated={(player) => {
-              storage.savePlayer(player);
+              setExistingPlayers((prevPlayers) => [...prevPlayers, player]);
               setShowNewPlayerModal(false);
               handleStartGame(player);
             }}
-          />
-        </Modal>
-      )}
-
-      {showConfigModal && (
-        <Modal onClose={() => setShowConfigModal(null)}>
-          <PlayerConfig
-            playerId={showConfigModal}
-            onClose={() => setShowConfigModal(null)}
+            onPlayerUpdated={(updatedPlayer) => {
+              setExistingPlayers((prevPlayers) =>
+                prevPlayers.map((p) =>
+                  p.id === updatedPlayer.id ? updatedPlayer : p
+                )
+              );
+              setPlayerToEdit(null);
+            }}
+            playerToEdit={playerToEdit}
           />
         </Modal>
       )}

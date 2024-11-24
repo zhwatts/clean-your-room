@@ -1,17 +1,22 @@
 /** @format */
 
 import { useEffect, useRef } from "react";
-import { GameState, Player } from "../../types";
+import { GameState } from "../../types";
 import "./Room.css";
 
 interface RoomProps {
   gameState: GameState;
-  player: Player;
+  avatarSrc: string;
   onCollision: (clutterIndex: number) => void;
   onDepositClutter: () => void;
 }
 
-function Room({ gameState, player, onCollision, onDepositClutter }: RoomProps) {
+function Room({
+  gameState,
+  avatarSrc,
+  onCollision,
+  onDepositClutter,
+}: RoomProps) {
   const roomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,7 +105,7 @@ function Room({ gameState, player, onCollision, onDepositClutter }: RoomProps) {
         style={{
           left: gameState.player.x,
           top: gameState.player.y,
-          backgroundImage: player.avatar ? `url(${player.avatar})` : undefined,
+          backgroundImage: `url(${avatarSrc})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

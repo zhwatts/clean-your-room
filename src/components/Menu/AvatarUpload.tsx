@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import "./AvatarUpload.css";
 
 interface AvatarUploadProps {
-  currentAvatar?: string;
+  currentAvatar?: string | null;
   onAvatarChange: (avatarBase64: string) => void;
   onAvatarDelete: () => void;
   onTakePhoto: () => void;

@@ -1,7 +1,8 @@
 /** @format */
 
-import { useState } from "react";
-import { Player } from "../../types";
+import React, { useState, useEffect } from "react";
+import { Player } from "../../models/Player";
+import { createPlayer, updatePlayer } from "../../services/PlayerService";
 import AvatarUpload from "./AvatarUpload";
 import "./NewPlayerForm.css";
 import { defaultAvatars } from "../../utils/defaultAvatars";
@@ -10,42 +11,83 @@ import WebcamCapture from "../UI/WebcamCapture";
 interface NewPlayerFormProps {
   existingPlayers: Player[];
   onPlayerCreated: (player: Player) => void;
+  onPlayerUpdated?: (player: Player) => void;
+  playerToEdit?: Player | null;
 }
 
-function NewPlayerForm({
+const NewPlayerForm: React.FC<NewPlayerFormProps> = ({
   existingPlayers,
   onPlayerCreated,
-}: NewPlayerFormProps) {
-  const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState<string | undefined>();
+  onPlayerUpdated,
+  playerToEdit,
+}) => {
+  const [name, setName] = useState(playerToEdit?.name || "");
+  const [avatarId, setAvatarId] = useState<string | undefined>(
+    playerToEdit?.avatarId
+  );
   const [showExistingAvatars, setShowExistingAvatars] = useState(false);
   const [showWebcam, setShowWebcam] = useState(false);
 
-  const handleCreatePlayer = () => {
+  useEffect(() => {
+    if (playerToEdit) {
+      setName(playerToEdit.name);
+      setAvatarId(playerToEdit.avatarId);
+    }
+  }, [playerToEdit]);
+
+  const saveImageToLocalStorage = (imageSrc: string): string => {
+    const imageId = `avatar-${crypto.randomUUID()}`;
+    localStorage.setItem(imageId, imageSrc);
+    return imageId;
+  };
+
+  const handleSubmit = async () => {
     if (!name.trim()) return;
 
-    const newPlayer: Player = {
-      id: crypto.randomUUID(),
+    const isLocal = avatarId?.startsWith("avatar-") || false;
+
+    const playerData: Player = {
+      id: playerToEdit ? playerToEdit.id : crypto.randomUUID(),
       name: name.trim(),
-      avatar,
+      avatarId: avatarId || "",
+      isLocalAvatar: isLocal,
+      bestTime: playerToEdit?.bestTime || null,
+      lastTime: playerToEdit?.lastTime || null,
     };
 
-    onPlayerCreated(newPlayer);
+    if (playerToEdit) {
+      const updatedPlayer = await updatePlayer(playerData.id, playerData);
+      if (updatedPlayer && onPlayerUpdated) {
+        onPlayerUpdated(updatedPlayer);
+      }
+    } else {
+      const createdPlayer = await createPlayer(playerData);
+      if (createdPlayer) {
+        onPlayerCreated(createdPlayer);
+      }
+    }
   };
 
   const existingAvatars = existingPlayers
-    .filter((p) => p.avatar)
-    .map((p) => ({ id: p.id, avatar: p.avatar!, name: p.name }));
+    .filter((p) => p.avatarId)
+    .map((p) => ({ id: p.id, avatar: p.avatarId, name: p.name }));
 
   return (
     <div className="new-player-form">
-      <h2>Create New Player</h2>
+      <h2>{playerToEdit ? "Edit Player" : "Create New Player"}</h2>
 
       <div className="avatar-section">
         <AvatarUpload
-          currentAvatar={avatar}
-          onAvatarChange={setAvatar}
-          onAvatarDelete={() => setAvatar(undefined)}
+          currentAvatar={
+            avatarId && avatarId.startsWith("avatar-")
+              ? localStorage.getItem(avatarId)
+              : avatarId
+          }
+          onAvatarChange={(imageSrc) => {
+            const imageId = saveImageToLocalStorage(imageSrc);
+            setAvatarId(imageId);
+          }}
+          onAvatarDelete={() => setAvatarId(undefined)}
           onTakePhoto={() => setShowWebcam(true)}
         />
 
@@ -56,9 +98,9 @@ function NewPlayerForm({
               <div
                 key={defaultAvatar.id}
                 className={`avatar-option ${
-                  avatar === defaultAvatar.url ? "selected" : ""
+                  avatarId === defaultAvatar.url ? "selected" : ""
                 }`}
-                onClick={() => setAvatar(defaultAvatar.url)}
+                onClick={() => setAvatarId(defaultAvatar.url)}
               >
                 <img src={defaultAvatar.url} alt={defaultAvatar.id} />
               </div>
@@ -82,7 +124,7 @@ function NewPlayerForm({
                   className={`existing-avatar ${
                     avatar === avatar ? "selected" : ""
                   }`}
-                  onClick={() => setAvatar(avatar)}
+                  onClick={() => setAvatarId(avatar)}
                 >
                   <img src={avatar} alt="User Avatar" />
                 </div>
@@ -101,16 +143,17 @@ function NewPlayerForm({
 
       <button
         className="create-button"
-        onClick={handleCreatePlayer}
+        onClick={handleSubmit}
         disabled={!name.trim()}
       >
-        Create Player
+        {playerToEdit ? "Update Player" : "Create Player"}
       </button>
 
       {showWebcam && (
         <WebcamCapture
           onCapture={(imageSrc) => {
-            setAvatar(imageSrc);
+            const imageId = saveImageToLocalStorage(imageSrc);
+            setAvatarId(imageId);
             setShowWebcam(false);
           }}
           onClose={() => setShowWebcam(false)}
@@ -118,6 +161,6 @@ function NewPlayerForm({
       )}
     </div>
   );
-}
+};
 
 export default NewPlayerForm;
