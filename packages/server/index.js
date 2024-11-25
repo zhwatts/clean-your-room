@@ -59,6 +59,10 @@ app.put("/players/:id", async (req, res) => {
     const player = await Player.findOne({ id: req.params.id });
 
     if (player) {
+      if (!player.bestTime) {
+        player.bestTime = bestTime;
+      }
+
       if (bestTime && player.bestTime > bestTime) {
         player.bestTime = bestTime;
       }
