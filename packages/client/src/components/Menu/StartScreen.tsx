@@ -1,35 +1,36 @@
 /** @format */
 
-import { useState, useEffect } from "react";
-import { Player } from "../../models/Player";
+import { useState } from "react";
 import Modal from "../UI/Modal";
 import NewPlayerForm from "./NewPlayerForm";
 import "./StartScreen.css";
 import GameInstructionsModal from "../UI/GameInstructionsModal";
-import { fetchPlayers } from "../../services/PlayerService";
+import { usePlayers } from "../../hooks/usePlayers";
+import { Player } from "../../models/Player";
+import { sortPlayersByBestTime } from "../../utils/playerUtils";
+import GameTitle from "./GameTitle";
+import PlayerList from "./PlayerList";
 
 interface StartScreenProps {
   onPlayerSelect: (player: Player) => void;
 }
 
 function StartScreen({ onPlayerSelect }: StartScreenProps) {
+  // State Hooks
   const [showNewPlayerModal, setShowNewPlayerModal] = useState(false);
-  const [playerToEdit, setPlayerToEdit] = useState<Player | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [existingPlayers, setExistingPlayers] = useState<Player[]>([]);
 
-  useEffect(() => {
-    const loadPlayers = async () => {
-      const players = await fetchPlayers();
-      if (players) {
-        setExistingPlayers(players);
-      }
-    };
+  // Custom Hooks
+  const {
+    players: existingPlayers,
+    playerToEdit,
+    setPlayerToEdit,
+    addPlayer,
+    updatePlayer,
+  } = usePlayers();
 
-    loadPlayers();
-  }, []);
-
+  // Event Handlers
   const handleStartGame = (player: Player) => {
     setSelectedPlayer(player);
     setShowInstructions(true);
@@ -46,27 +47,15 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
     setShowInstructions(false);
   };
 
-  const sortedPlayers = [...existingPlayers].sort((a, b) => {
-    if (!a.bestTime && !b.bestTime) return 0;
-    if (!a.bestTime) return 1;
-    if (!b.bestTime) return -1;
-    return a.bestTime - b.bestTime;
-  });
+  // Use the utility function for sorting
+  const sortedPlayers = sortPlayersByBestTime(existingPlayers);
 
+  // Render Logic
   return (
     <div className="start-screen">
       <div className="main-content">
         <div className="main-content-inner">
-          <div className="game-title">
-            <h1>Clean Your Room!</h1>
-            <p className="tagline">An epic adventure to be spick and span</p>
-            <button
-              className="new-game-button"
-              onClick={() => setShowNewPlayerModal(true)}
-            >
-              Start Game with New Player
-            </button>
-          </div>
+          <GameTitle onNewGameClick={() => setShowNewPlayerModal(true)} />
         </div>
       </div>
 
@@ -76,54 +65,11 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
           {existingPlayers.length === 0 ? (
             <div className="no-players">No existing players</div>
           ) : (
-            <div className="players-list">
-              {sortedPlayers.map((player) => {
-                const avatarSrc = player.isLocalAvatar
-                  ? localStorage.getItem(player.avatarId) || ""
-                  : player.avatarId;
-
-                return (
-                  <div key={player.id} className="player-card">
-                    <div className="player-avatar">
-                      {avatarSrc ? (
-                        <img src={avatarSrc} alt={player.name} />
-                      ) : (
-                        <div className="avatar-placeholder">No Avatar</div>
-                      )}
-                    </div>
-                    <div className="player-info">
-                      <h3>{player.name}</h3>
-                      <div className="player-scores">
-                        {player.bestTime !== undefined && (
-                          <span className="best-time">
-                            Best: {Math.round(player.bestTime)}s
-                          </span>
-                        )}
-                        {player.lastTime !== undefined && (
-                          <span className="last-time">
-                            Last: {Math.round(player.lastTime)}s
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="player-actions">
-                      <button
-                        className="config-button"
-                        onClick={() => setPlayerToEdit(player)}
-                      >
-                        Config
-                      </button>
-                      <button
-                        className="play-button"
-                        onClick={() => handleStartGame(player)}
-                      >
-                        Play
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <PlayerList
+              players={sortedPlayers}
+              onConfigClick={setPlayerToEdit}
+              onPlayClick={handleStartGame}
+            />
           )}
         </div>
         <div id="credit-footer">Fun as designed, by ZachWatts.Online 🤖</div>
@@ -139,16 +85,12 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
           <NewPlayerForm
             existingPlayers={existingPlayers}
             onPlayerCreated={(player) => {
-              setExistingPlayers((prevPlayers) => [...prevPlayers, player]);
+              addPlayer(player);
               setShowNewPlayerModal(false);
               handleStartGame(player);
             }}
             onPlayerUpdated={(updatedPlayer) => {
-              setExistingPlayers((prevPlayers) =>
-                prevPlayers.map((p) =>
-                  p.id === updatedPlayer.id ? updatedPlayer : p
-                )
-              );
+              updatePlayer(updatedPlayer);
               setPlayerToEdit(null);
             }}
             playerToEdit={playerToEdit}
