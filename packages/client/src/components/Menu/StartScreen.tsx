@@ -56,59 +56,62 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
   return (
     <div className="start-screen">
       <div className="players-sidebar">
-        <h2 className="sidebar-header">Leader Board</h2>
-        {existingPlayers.length === 0 ? (
-          <div className="no-players">No existing players</div>
-        ) : (
-          <div className="players-list">
-            {sortedPlayers.map((player) => {
-              const avatarSrc = player.isLocalAvatar
-                ? localStorage.getItem(player.avatarId) || ""
-                : player.avatarId;
+        <div>
+          <h2 className="sidebar-header">Leader Board</h2>
+          {existingPlayers.length === 0 ? (
+            <div className="no-players">No existing players</div>
+          ) : (
+            <div className="players-list">
+              {sortedPlayers.map((player) => {
+                const avatarSrc = player.isLocalAvatar
+                  ? localStorage.getItem(player.avatarId) || ""
+                  : player.avatarId;
 
-              return (
-                <div key={player.id} className="player-card">
-                  <div className="player-avatar">
-                    {avatarSrc ? (
-                      <img src={avatarSrc} alt={player.name} />
-                    ) : (
-                      <div className="avatar-placeholder">No Avatar</div>
-                    )}
-                  </div>
-                  <div className="player-info">
-                    <h3>{player.name}</h3>
-                    <div className="player-scores">
-                      {player.bestTime !== undefined && (
-                        <span className="best-time">
-                          Best: {Math.round(player.bestTime)}s
-                        </span>
-                      )}
-                      {player.lastTime !== undefined && (
-                        <span className="last-time">
-                          Last: {Math.round(player.lastTime)}s
-                        </span>
+                return (
+                  <div key={player.id} className="player-card">
+                    <div className="player-avatar">
+                      {avatarSrc ? (
+                        <img src={avatarSrc} alt={player.name} />
+                      ) : (
+                        <div className="avatar-placeholder">No Avatar</div>
                       )}
                     </div>
+                    <div className="player-info">
+                      <h3>{player.name}</h3>
+                      <div className="player-scores">
+                        {player.bestTime !== undefined && (
+                          <span className="best-time">
+                            Best: {Math.round(player.bestTime)}s
+                          </span>
+                        )}
+                        {player.lastTime !== undefined && (
+                          <span className="last-time">
+                            Last: {Math.round(player.lastTime)}s
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="player-actions">
+                      <button
+                        className="config-button"
+                        onClick={() => setPlayerToEdit(player)}
+                      >
+                        Config
+                      </button>
+                      <button
+                        className="play-button"
+                        onClick={() => handleStartGame(player)}
+                      >
+                        Play
+                      </button>
+                    </div>
                   </div>
-                  <div className="player-actions">
-                    <button
-                      className="config-button"
-                      onClick={() => setPlayerToEdit(player)}
-                    >
-                      Config
-                    </button>
-                    <button
-                      className="play-button"
-                      onClick={() => handleStartGame(player)}
-                    >
-                      Play
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div id="credit-footer">Fun as designed, by ZachWatts.Online 🤖</div>
       </div>
 
       <div className="main-content">
