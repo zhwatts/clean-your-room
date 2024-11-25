@@ -3,7 +3,7 @@
 import axios from "axios";
 import { Player } from "../models/Player";
 
-const API_URL = "https://clean-your-room-be.vercel.app";
+const API_URL = import.meta.env.VITE_API_URL || "https://default-url.com";
 
 export const createPlayer = async (
   player: Player
