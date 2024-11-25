@@ -55,6 +55,21 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
 
   return (
     <div className="start-screen">
+      <div className="main-content">
+        <div className="main-content-inner">
+          <div className="game-title">
+            <h1>Clean Your Room!</h1>
+            <p className="tagline">An epic adventure to be spick and span</p>
+            <button
+              className="new-game-button"
+              onClick={() => setShowNewPlayerModal(true)}
+            >
+              Start Game with New Player
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="players-sidebar">
         <div>
           <h2 className="sidebar-header">Leader Board</h2>
@@ -112,21 +127,6 @@ function StartScreen({ onPlayerSelect }: StartScreenProps) {
           )}
         </div>
         <div id="credit-footer">Fun as designed, by ZachWatts.Online 🤖</div>
-      </div>
-
-      <div className="main-content">
-        <div className="main-content-inner">
-          <div className="game-title">
-            <h1>Clean Your Room!</h1>
-            <p className="tagline">An epic adventure to be spick and span</p>
-            <button
-              className="new-game-button"
-              onClick={() => setShowNewPlayerModal(true)}
-            >
-              Start Game with New Player
-            </button>
-          </div>
-        </div>
       </div>
 
       {(showNewPlayerModal || playerToEdit) && (
