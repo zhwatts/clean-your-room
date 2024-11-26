@@ -54,6 +54,7 @@ const NewPlayerForm: React.FC<NewPlayerFormProps> = ({
       isLocalAvatar: isLocal,
       bestTime: playerToEdit?.bestTime || undefined,
       lastTime: playerToEdit?.lastTime || undefined,
+      token: playerToEdit?.token,
     };
 
     if (playerToEdit) {
@@ -65,10 +66,10 @@ const NewPlayerForm: React.FC<NewPlayerFormProps> = ({
     } else {
       const createdPlayer = await createPlayer(playerData);
       if (createdPlayer) {
+        const playerTokens = JSON.parse(Cookies.get("playerTokens") || "[]");
+        playerTokens.push(createdPlayer.token);
+        Cookies.set("playerTokens", JSON.stringify(playerTokens));
         onPlayerCreated(createdPlayer);
-        if (createdPlayer.token) {
-          Cookies.set("playerToken", createdPlayer.token); // Set the token in a cookie
-        }
       }
     }
   };

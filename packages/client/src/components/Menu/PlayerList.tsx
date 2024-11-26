@@ -10,7 +10,7 @@ interface PlayerListProps {
 }
 
 function PlayerList({ players, onConfigClick, onPlayClick }: PlayerListProps) {
-  const playerToken = Cookies.get("playerToken");
+  const playerTokens = JSON.parse(Cookies.get("playerTokens") || "[]");
 
   return (
     <div className="players-list">
@@ -19,7 +19,7 @@ function PlayerList({ players, onConfigClick, onPlayClick }: PlayerListProps) {
           ? localStorage.getItem(player.avatarId) || ""
           : player.avatarId;
 
-        const canEditOrPlay = player.token === playerToken;
+        const canEditOrPlay = playerTokens.includes(player.token);
 
         return (
           <div key={player.id} className="player-card">

@@ -33,18 +33,6 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model("Player", playerSchema);
 
-function verifyToken(req, res, next) {
-  const { token } = req.cookies;
-  const { id } = req.params;
-
-  Player.findOne({ id, token }, (err, player) => {
-    if (err || !player) {
-      return res.status(403).send({ message: "Forbidden" });
-    }
-    next();
-  });
-}
-
 // Routes
 app.post("/players", async (req, res) => {
   const { id, name, avatarId } = req.body;
@@ -68,7 +56,7 @@ app.post("/players", async (req, res) => {
   }
 });
 
-app.put("/players/:id", verifyToken, async (req, res) => {
+app.put("/players/:id", async (req, res) => {
   const { bestTime, lastTime, avatarId, name, isLocalAvatar } = req.body;
 
   try {
@@ -172,7 +160,7 @@ app.put("/players/:id/update-times", async (req, res) => {
   }
 });
 
-app.delete("/players/:id", verifyToken, async (req, res) => {
+app.delete("/players/:id", async (req, res) => {
   try {
     const result = await Player.deleteOne({ id: req.params.id });
 

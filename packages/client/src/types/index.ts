@@ -6,6 +6,7 @@ export interface Player {
   avatar?: string;
   bestTime?: number;
   lastTime?: number;
+  token?: string;
 }
 
 export interface ClutterItem {

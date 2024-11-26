@@ -5,6 +5,7 @@ import AvatarUpload from "./AvatarUpload";
 import "./PlayerConfig.css";
 import { storage } from "../../utils/storage";
 import { Player } from "../../types";
+import Cookies from "js-cookie";
 
 interface PlayerConfigProps {
   playerId: string;
@@ -23,6 +24,7 @@ function PlayerConfig({ playerId, onClose }: PlayerConfigProps) {
     const updatedPlayer: Player = {
       ...player,
       name: name.trim(),
+      token: player.token,
     };
 
     storage.savePlayer(updatedPlayer);
@@ -38,6 +40,11 @@ function PlayerConfig({ playerId, onClose }: PlayerConfigProps) {
 
   const handleDelete = () => {
     storage.deletePlayer(playerId);
+    const playerTokens = JSON.parse(Cookies.get("playerTokens") || "[]");
+    const updatedTokens = playerTokens.filter(
+      (token: string) => token !== player.token
+    );
+    Cookies.set("playerTokens", JSON.stringify(updatedTokens));
     onClose();
     window.location.reload();
   };
