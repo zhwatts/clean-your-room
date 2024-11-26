@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { Player } from "../../models/Player";
 import Room from "./Room";
 import usePlayerControls from "../../hooks/usePlayerControls";
-import { storage } from "../../utils/storage";
 import "./Game.css";
 import { generateGameState } from "../../utils/gameSetup";
 import { soundManager } from "../../utils/sounds";
@@ -20,15 +19,12 @@ interface GameProps {
 const COOLDOWN_TIME = 3; // seconds
 
 function Game({ player, onGameEnd }: GameProps) {
-  // Add state declarations at the top
   const [showCountdown, setShowCountdown] = useState(true);
   const [gameActive, setGameActive] = useState(false);
   const [activeChannel, setActiveChannel] = useState<"A" | "B" | null>("A");
 
-  // Initialize game state using the utility
   const [gameState, setGameState] = useState(generateGameState());
 
-  // Start music when component mounts
   useEffect(() => {
     try {
       musicManager.playChannelA();
@@ -37,13 +33,11 @@ function Game({ player, onGameEnd }: GameProps) {
     }
   }, []);
 
-  // Get player controls with initial position from gameState
   const { position, isSpacePressed, hasObstacleCollision } = usePlayerControls(
     gameActive ? gameState.obstacles : [],
     { x: gameState.player.x, y: gameState.player.y }
   );
 
-  // Update position effect - remove validation here
   useEffect(() => {
     if (gameActive && position) {
       setGameState((prev) => ({
@@ -57,7 +51,6 @@ function Game({ player, onGameEnd }: GameProps) {
     }
   }, [gameActive, position]);
 
-  // Start game timer only when game is active
   useEffect(() => {
     if (!gameActive) return;
 
@@ -71,7 +64,6 @@ function Game({ player, onGameEnd }: GameProps) {
     return () => clearInterval(timer);
   }, [gameActive]);
 
-  // Handle dropping clutter when space is released
   useEffect(() => {
     if (!isSpacePressed && gameState.player.hasClutter) {
       soundManager.play("drop");
@@ -103,7 +95,6 @@ function Game({ player, onGameEnd }: GameProps) {
     }
   }, [isSpacePressed]);
 
-  // Handle obstacle collisions
   useEffect(() => {
     if (hasObstacleCollision) {
       soundManager.play("bump");
@@ -179,24 +170,7 @@ function Game({ player, onGameEnd }: GameProps) {
         const newClutter = prev.clutter.filter((c) => !c.isPickedUp);
 
         if (newClutter.length === 0) {
-          storage.saveScore(player.id, prev.currentTime);
-          musicManager.stopAll();
-          soundManager.play("complete");
-
-          // Debugging: Log the current and best times
-          console.log(
-            `Player: ${player.name}, Last Time: ${prev.currentTime}, Best Time: ${player.bestTime}`
-          );
-
-          // Update player scores in the backend
-          console.log("PLAYER TO UPDATE", player);
-
-          updatePlayerTimes(player.id, {
-            bestTime: prev.currentTime,
-            lastTime: prev.currentTime,
-          });
-
-          setTimeout(onGameEnd, 1000);
+          handleGameEnd(player.id, prev.currentTime);
         } else {
           soundManager.play("deposit");
         }
@@ -214,14 +188,19 @@ function Game({ player, onGameEnd }: GameProps) {
     }
   };
 
-  // Handle countdown completion
+  const handleGameEnd = (playerId: string, timeElapsed: number) => {
+    updatePlayerTimes(playerId, { lastTime: timeElapsed });
+    musicManager.stopAll();
+    soundManager.play("complete");
+    setTimeout(onGameEnd, 1000);
+  };
+
   const handleCountdownComplete = useCallback(() => {
     setShowCountdown(false);
     setGameActive(true);
     soundManager.play("start");
   }, []);
 
-  // Add cooldown timer effect
   useEffect(() => {
     const cooldownTimer = setInterval(() => {
       setGameState((prev) => ({
@@ -247,14 +226,9 @@ function Game({ player, onGameEnd }: GameProps) {
     return () => clearInterval(cooldownTimer);
   }, []);
 
-  // Determine the avatar source
   const avatarSrc = player.isLocalAvatar
     ? localStorage.getItem(player.avatarId) || ""
     : player.avatarId;
-
-  const handleGameEnd = (playerId: string, timeElapsed: number) => {
-    updatePlayerTimes(playerId, { lastTime: timeElapsed });
-  };
 
   return (
     <div className="game">
