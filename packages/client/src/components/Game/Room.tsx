@@ -9,6 +9,9 @@ interface RoomProps {
   avatarSrc: string;
   onCollision: (clutterIndex: number) => void;
   onDepositClutter: () => void;
+  vacuum: { x: number; y: number; direction: string };
+  playerHit: boolean;
+  countdown: number | null;
 }
 
 function Room({
@@ -16,6 +19,9 @@ function Room({
   avatarSrc,
   onCollision,
   onDepositClutter,
+  vacuum,
+  playerHit,
+  countdown,
 }: RoomProps) {
   const roomRef = useRef<HTMLDivElement>(null);
 
@@ -28,7 +34,6 @@ function Room({
         height: 32,
       };
 
-      // Check clutter collisions
       gameState.clutter.forEach((clutter, index) => {
         if (!clutter.isPickedUp && !clutter.isDropped) {
           const clutterRect = {
@@ -44,7 +49,6 @@ function Room({
         }
       });
 
-      // Check toy box collision
       const toyBoxRect = {
         x: roomRef.current?.clientWidth! / 2 - 50,
         y: roomRef.current?.clientHeight! - 60,
@@ -101,7 +105,9 @@ function Room({
         );
       })}
       <div
-        className={`player ${gameState.player.hasClutter ? "has-clutter" : ""}`}
+        className={`player ${
+          gameState.player.hasClutter ? "has-clutter" : ""
+        } ${playerHit ? "hit" : ""}`}
         style={{
           left: gameState.player.x,
           top: gameState.player.y,
@@ -109,10 +115,23 @@ function Room({
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-      />
+      >
+        {playerHit && countdown !== null && (
+          <span className="countdown">{countdown}</span>
+        )}
+      </div>
       <div className="toy-box">
         <span className="toy-box-emoji">🧸</span>
       </div>
+      <div
+        className="vacuum"
+        style={{
+          left: vacuum.x,
+          top: vacuum.y,
+          width: 60,
+          height: 60,
+        }}
+      />
     </div>
   );
 }
