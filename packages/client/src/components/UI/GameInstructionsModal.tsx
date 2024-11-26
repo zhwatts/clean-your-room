@@ -59,7 +59,8 @@ function GameInstructionsModal({
             clutter, pick it up by pressing and holding space bar. Watch out for
             obstacles! If you bump something, you'll drop your clutter, and
             won't be able to pick it back up for 3 seconds. Win the game by
-            depositing all the clutter into your toy box!
+            depositing all the clutter into your toy box. Watch out for that
+            pesky vacuum cleaner!
           </p>
         </div>
 
