@@ -226,8 +226,19 @@ function Game({ player, onGameEnd }: GameProps) {
           width: 24,
           height: 24,
         };
-        return !isColliding(clutterRect, vacuumRect);
+        const isCollected = isColliding(clutterRect, vacuumRect);
+        if (isCollected) {
+          return false;
+        }
+        return true;
       });
+
+      if (remainingClutter.length !== prev.clutter.length) {
+        setGameState((prev) => ({
+          ...prev,
+          currentTime: prev.currentTime + 15,
+        }));
+      }
 
       if (remainingClutter.length === 0) {
         handleGameEnd(player.id, prev.currentTime);
