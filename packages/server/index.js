@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
+import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -25,22 +26,37 @@ const playerSchema = new mongoose.Schema({
   name: String,
   avatarId: String,
   isLocalAvatar: Boolean,
-  bestTime: Number,
-  lastTime: Number,
+  bestTime: { type: Number, default: null },
+  lastTime: { type: Number, default: null },
+  token: String,
 });
 
 const Player = mongoose.model("Player", playerSchema);
+
+function verifyToken(req, res, next) {
+  const { token } = req.cookies;
+  const { id } = req.params;
+
+  Player.findOne({ id, token }, (err, player) => {
+    if (err || !player) {
+      return res.status(403).send({ message: "Forbidden" });
+    }
+    next();
+  });
+}
 
 // Routes
 app.post("/players", async (req, res) => {
   const { id, name, avatarId } = req.body;
   const isLocalAvatar = avatarId ? avatarId.startsWith("avatar-") : false;
+  const token = uuidv4();
 
   const player = new Player({
     id,
     name,
     avatarId,
     isLocalAvatar,
+    token,
   });
 
   try {
@@ -52,7 +68,7 @@ app.post("/players", async (req, res) => {
   }
 });
 
-app.put("/players/:id", async (req, res) => {
+app.put("/players/:id", verifyToken, async (req, res) => {
   const { bestTime, lastTime, avatarId, name, isLocalAvatar } = req.body;
 
   try {
@@ -125,8 +141,38 @@ app.put("/players/:id/clear-scores", async (req, res) => {
   }
 });
 
-// Delete player
-app.delete("/players/:id", async (req, res) => {
+// Update player times
+app.put("/players/:id/update-times", async (req, res) => {
+  const { lastTime } = req.body; // Receive only the most recent game time
+
+  try {
+    const player = await Player.findOne({ id: req.params.id });
+
+    if (player) {
+      // Update lastTime with the most recent game time
+      player.lastTime = lastTime;
+
+      // Update bestTime only if the new time is better
+      if (
+        player.bestTime === undefined ||
+        player.bestTime === null ||
+        lastTime < player.bestTime
+      ) {
+        player.bestTime = lastTime;
+      }
+
+      await player.save();
+      res.send(player);
+    } else {
+      res.status(404).send({ message: "Player not found" });
+    }
+  } catch (error) {
+    console.error("Error updating player times:", error);
+    res.status(400).send(error);
+  }
+});
+
+app.delete("/players/:id", verifyToken, async (req, res) => {
   try {
     const result = await Player.deleteOne({ id: req.params.id });
 

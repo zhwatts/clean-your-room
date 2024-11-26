@@ -9,6 +9,7 @@ const playerSchema = new mongoose.Schema({
   isLocalAvatar: Boolean,
   bestTime: { type: Number, default: null },
   lastTime: { type: Number, default: null },
+  token: String,
 });
 
 module.exports = mongoose.model("Player", playerSchema);

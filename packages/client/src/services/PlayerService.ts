@@ -70,3 +70,29 @@ export const deletePlayer = async (playerId: string): Promise<boolean> => {
     return false;
   }
 };
+
+export const updatePlayerTimes = async (
+  playerId: string,
+  times: { bestTime?: number; lastTime?: number }
+) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/players/${playerId}/update-times`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(times),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update player times");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating player times:", error);
+  }
+};

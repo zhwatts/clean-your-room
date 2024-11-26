@@ -7,6 +7,7 @@ import AvatarUpload from "./AvatarUpload";
 import "./NewPlayerForm.css";
 import { defaultAvatars } from "../../utils/defaultAvatars";
 import WebcamCapture from "../UI/WebcamCapture";
+import Cookies from "js-cookie"; // Import js-cookie library
 
 interface NewPlayerFormProps {
   existingPlayers: Player[];
@@ -65,6 +66,9 @@ const NewPlayerForm: React.FC<NewPlayerFormProps> = ({
       const createdPlayer = await createPlayer(playerData);
       if (createdPlayer) {
         onPlayerCreated(createdPlayer);
+        if (createdPlayer.token) {
+          Cookies.set("playerToken", createdPlayer.token); // Set the token in a cookie
+        }
       }
     }
   };

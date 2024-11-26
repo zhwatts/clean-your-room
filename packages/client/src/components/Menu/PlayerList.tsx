@@ -1,6 +1,7 @@
 /** @format */
 
 import { Player } from "../../models/Player";
+import Cookies from "js-cookie";
 
 interface PlayerListProps {
   players: Player[];
@@ -9,12 +10,16 @@ interface PlayerListProps {
 }
 
 function PlayerList({ players, onConfigClick, onPlayClick }: PlayerListProps) {
+  const playerToken = Cookies.get("playerToken");
+
   return (
     <div className="players-list">
       {players.map((player) => {
         const avatarSrc = player.isLocalAvatar
           ? localStorage.getItem(player.avatarId) || ""
           : player.avatarId;
+
+        const canEditOrPlay = player.token === playerToken;
 
         return (
           <div key={player.id} className="player-card">
@@ -41,18 +46,22 @@ function PlayerList({ players, onConfigClick, onPlayClick }: PlayerListProps) {
               </div>
             </div>
             <div className="player-actions">
-              <button
-                className="config-button"
-                onClick={() => onConfigClick(player)}
-              >
-                Config
-              </button>
-              <button
-                className="play-button"
-                onClick={() => onPlayClick(player)}
-              >
-                Play
-              </button>
+              {canEditOrPlay && (
+                <>
+                  <button
+                    className="config-button"
+                    onClick={() => onConfigClick(player)}
+                  >
+                    Config
+                  </button>
+                  <button
+                    className="play-button"
+                    onClick={() => onPlayClick(player)}
+                  >
+                    Play
+                  </button>
+                </>
+              )}
             </div>
           </div>
         );

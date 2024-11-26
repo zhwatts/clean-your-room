@@ -8,6 +8,7 @@ export interface Player {
   bestTime?: number;
   lastTime?: number;
   avatarId: string;
+  token?: string;
 }
 
 export interface PlayerScore {

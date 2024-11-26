@@ -10,7 +10,7 @@ import { generateGameState } from "../../utils/gameSetup";
 import { soundManager } from "../../utils/sounds";
 import { musicManager } from "../../utils/music";
 import CountdownModal from "../UI/CountdownModal";
-import { updatePlayer } from "../../services/PlayerService"; // Import updatePlayer
+import { updatePlayerTimes } from "../../services/PlayerService";
 
 interface GameProps {
   player: Player;
@@ -191,13 +191,9 @@ function Game({ player, onGameEnd }: GameProps) {
           // Update player scores in the backend
           console.log("PLAYER TO UPDATE", player);
 
-          updatePlayer(player.id, {
-            lastTime: prev.currentTime,
+          updatePlayerTimes(player.id, {
             bestTime: prev.currentTime,
-            // player.bestTime === null ||
-            // prev.currentTime < (player.bestTime ?? Infinity)
-            //   ? prev.currentTime
-            //   : player.bestTime,
+            lastTime: prev.currentTime,
           });
 
           setTimeout(onGameEnd, 1000);
@@ -255,6 +251,10 @@ function Game({ player, onGameEnd }: GameProps) {
   const avatarSrc = player.isLocalAvatar
     ? localStorage.getItem(player.avatarId) || ""
     : player.avatarId;
+
+  const handleGameEnd = (playerId: string, timeElapsed: number) => {
+    updatePlayerTimes(playerId, { lastTime: timeElapsed });
+  };
 
   return (
     <div className="game">
