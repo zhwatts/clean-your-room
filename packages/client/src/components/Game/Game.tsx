@@ -137,6 +137,14 @@ function Game({ player, onGameEnd }: GameProps) {
   }, [hasObstacleCollision]);
 
   useEffect(() => {
+    if (gameActive) {
+      soundManager.play("vacuum");
+    } else {
+      soundManager.stop("vacuum");
+    }
+  }, [gameActive]);
+
+  useEffect(() => {
     const vacuumInterval = setInterval(() => {
       setVacuum((prev) => {
         let newX = prev.x;
@@ -185,7 +193,10 @@ function Game({ player, onGameEnd }: GameProps) {
       });
     }, 50);
 
-    return () => clearInterval(vacuumInterval);
+    return () => {
+      clearInterval(vacuumInterval);
+      soundManager.stop("vacuum");
+    };
   }, [gameState.obstacles]);
 
   useEffect(() => {
@@ -370,6 +381,7 @@ function Game({ player, onGameEnd }: GameProps) {
   const handleGameEnd = (playerId: string, timeElapsed: number) => {
     updatePlayerTimes(playerId, { lastTime: timeElapsed });
     musicManager.stopAll();
+    soundManager.stop("vacuum");
     soundManager.play("complete");
     setTimeout(onGameEnd, 1000);
   };
